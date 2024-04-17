@@ -14,8 +14,8 @@ services:
       - "${MY_DOCKER_IP:-127.0.0.1}:8085:8085"
     depends_on:
       - stac-fastapi
-      - titiler-pgstac
       - database
+      #- titiler-pgstac
       
   stac-fastapi:
     container_name: base_stac_api_container
