@@ -2,7 +2,8 @@ version: '3'
 
 services:
 
-  # change to official image when available https://github.com/radiantearth/stac-browser/pull/386
+  # The dockerfile that creates this image uses an nginx:1-alpine-slim base image
+  # And copies a fresh checkout of the main branch of stac-browser into the app directory.
   stac-browser:
     container_name: base_stac_browser_container
     platform: linux/amd64
@@ -62,6 +63,8 @@ services:
 
   titiler-pgstac:
     container_name: base_titiler_container
+    profiles:
+      - full_eoapi
     # At the time of writing, rasterio and psycopg wheels are not available for arm64 arch
     # so we force the image to be built with linux/amd64
     platform: linux/amd64
@@ -112,6 +115,8 @@ services:
 
   tipg:
     container_name: base_tipg_container
+    profiles:
+      - full_eoapi
     platform: linux/amd64
     image: ghcr.io/developmentseed/tipg:0.5.0
     ports:
