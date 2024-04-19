@@ -14,17 +14,40 @@ format_STAC_for_pypgstac_ingest() {
 
   echo ""
   echo "Catalog name: $catalog_name"
-  echo "downloading STAC catalog JSON file from URL: $stac_catalog_url"
 
-  curl -o temp_catalog.json $stac_catalog_url
-  pypgstac load collections temp_catalog.json --dsn postgresql://$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST:5439/$POSTGRES_DBNAME --method insert_ignore debug=True
+  if [[ -d "$catalog_name" ]]; then
+    echo "The directory \"$catalog_name\" already exists."
+  else
+    echo "Creating directory \"$catalog_name\"."
+    mkdir "$catalog_name"
+  fi
+
+  echo "downloading STAC catalog JSON file from URL: $stac_catalog_url"
+  stac_json_filepath="$catalog_name/temp_catalog.json"
+  modified_stac_json_filepath="$catalog_name/temp_catalog_modified.json"
+  curl -C - -o "$stac_json_filepath" $stac_catalog_url
+
+  # rename Catalog in catalog file
+  old_catalog_name=$(jq ".id" "$stac_json_filepath")
+
+  # FIXME: ADD "last Synced on this tatetime todescription"
+  #
+  # FIXME: dummyproof this script to check if the regular expression
+  # delimiter I use herer '/' is itself in either string
+  sed "s/$old_catalog_name/\"$catalog_name\"/" < "$stac_json_filepath" > "$modified_stac_json_filepath"
+  #pypgstac load collections "modified_stac_json_filepath" --dsn postgresql://$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST:5439/$POSTGRES_DBNAME --method insert_ignore debug=True
 
   echo "downloading STAC item_collection JSON file from URL: $stac_item_collection_url"
-  curl -o temp_item_collection.json $stac_item_collection_url
+  stac_json_filepath="$catalog_name/temp_item_collection.json"
+  modified_stac_json_filepath="$catalog_name/temp_item_collection_modified.json"
+  curl -C - -o "$stac_json_filepath" $stac_item_collection_url
 
-  jq '.features' temp_item_collection.json > temp_item_collection_FORMATTED.json
-  jq 'map(. + {"collection": "$catalog_name"})' temp_item_collection.json > temp_item_collection_FORMATTED.json
-  pypgstac load items temp_item_collection_FORMATTED.json --dsn postgresql://$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST:5439/$POSTGRES_DBNAME
+  # Rename Catalog in ItemCollection file
+  #sed 's/$old_catalog_name/"$catalog_name"/' < "$stac_json_filepath" > "$modified_stac_json_filepath"
+  jq ".features | map(. + {\"collection\": \"$catalog_name\"})" \
+    "$stac_json_filepath" > "$modified_stac_json_filepath"
+
+  #pypgstac load items "$modified_stac_json_filepath" --dsn postgresql://$POSTGRES_USER:$POSTGRES_PASS@$POSTGRES_HOST:5439/$POSTGRES_DBNAME
 }
 
 name="EXTERNAL NODE: NOAA Coastal LIDAR STAC Catalog"
