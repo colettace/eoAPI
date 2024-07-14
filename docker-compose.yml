@@ -1,11 +1,9 @@
-version: '3'
-
 services:
 
   # The database backend is the only container that starts by default
   # Profiles must be used to populate the database, run the demo, etc
   database:
-    container_name: base_pgstac_database_container
+    container_name: pgstac_database_container
     platform: linux/amd64
     image: ghcr.io/stac-utils/pgstac:v0.8.5
     environment:
@@ -23,7 +21,7 @@ services:
 
   # For now, keeping the pgAdmin container in the default profile group so will run every time
   pgadmin:
-    container_name: base_pgadmin_container
+    container_name: pgadmin_container
     image: dpage/pgadmin4:latest
     environment:
       PGADMIN_DEFAULT_EMAIL: "admin@admin.com"
@@ -36,9 +34,7 @@ services:
   # The dockerfile that creates this image uses an nginx:1-alpine-slim base image
   # And copies a fresh checkout of the main branch of stac-browser into the app directory.
   stac-browser:
-    container_name: base_stac_browser_container
-    profiles:
-      - demo
+    container_name: stac_browser_container
     platform: linux/amd64
     build:
       context: dockerfiles
@@ -51,9 +47,7 @@ services:
       #- titiler-pgstac
       
   stac-fastapi:
-    container_name: base_stac_api_container
-    profiles:
-    - demo
+    container_name: stac_api_container
     # Note:
     # the official ghcr.io/stac-utils/stac-fastapi-pgstac image uses python 3.8 and uvicorn
     # which is why here we use a custom Dockerfile using python 3.11 and gunicorn
@@ -184,33 +178,33 @@ services:
   jupyterhub:
     container_name: base_jupyterhub_container
     platform: linux/amd64
-    profiles:
-      - demo
-    image: quay.io/jupyter/all-spark-notebook
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.jupyterhub
     ports:
       - "${MY_DOCKER_IP:-127.0.0.1}:8888:8888"
     environment:
       JUPYTER_TOKEN: "password"
 
 
-  populate_database_for_demo:
-    container_name: populate_database_for_demo_container
-    profiles:
-      - initialize_db_for_demo_profile
-    build:
-      context: .
-      dockerfile: dockerfiles/Dockerfile.populate_database_for_demo
-    environment:
-      # Postgres connection
-      - POSTGRES_USER=username
-      - POSTGRES_PASS=password
-      - POSTGRES_DBNAME=postgis
-      - POSTGRES_HOST=database
-      - POSTGRES_PORT=5432
-    depends_on:
-      - database
-    volumes:
-      - ./dockerfiles/scripts:/app/scripts
+#  populate_database_for_demo:
+#    container_name: populate_database_for_demo_container
+#    profiles:
+#      - initialize_db_for_demo_profile
+#    build:
+#      context: .
+#      dockerfile: dockerfiles/Dockerfile.populate_database_for_demo
+#    environment:
+#      # Postgres connection
+#      - POSTGRES_USER=username
+#      - POSTGRES_PASS=password
+#      - POSTGRES_DBNAME=postgis
+#      - POSTGRES_HOST=database
+#      - POSTGRES_PORT=5432
+#    depends_on:
+#      - database
+#    volumes:
+#      - ./dockerfiles/scripts:/app/scripts
 
 networks:
   default:
