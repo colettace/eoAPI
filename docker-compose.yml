@@ -17,12 +17,25 @@ services:
       - database
       
   stac-fastapi:
-    container_name: stac_api_container
+    container_name: stac_fastapi_pgstac_container
     platform: linux/amd64
     image: ghcr.io/stac-utils/stac-fastapi-pgstac:latest
     ports:
       - "${MY_DOCKER_IP:-127.0.0.1}:8081:8081"
     environment:
+      # STAC-FastAPI configuration
+      # Defined via pydantic settings, case insensitively
+      # See stac-fastapi/types/stac-fastapi/types/config.py <-- repeated nested dir *not* a typo!
+      - STAC_FASTAPI_TITLE=USGS 3DEP Data Ecosystem
+      - STAC_FASTAPI_DESCRIPTION=Proof of concept executed for USGS National Geospatial Program by GSA Centers of Excellence
+      - STAC_FASTAPI_VERSION=0.2
+      - STAC_FASTAPI_LANDING_ID=usgs_3dep
+      #- APP_HOST=0.0.0.0
+      #- APP_PORT=8000
+      #- RELOAD=1
+      #- ENABLE_RESPONSE_MODELS=1
+      #- OPENAPI_URL=api
+      #- DOCS_URL=api.html
       # Postgres connection
       - POSTGRES_USER=username
       - POSTGRES_PASS=password
@@ -32,9 +45,6 @@ services:
       - POSTGRES_PORT=5432
       - DB_MIN_CONN_SIZE=1
       - DB_MAX_CONN_SIZE=10
-      # PgSTAC extensions
-      - EOAPI_STAC_EXTENSIONS=["filter", "query", "sort", "fields", "pagination", "context", "transaction"]
-      - EOAPI_STAC_CORS_METHODS='GET,POST,PUT,OPTIONS'
     depends_on:
       - database
     command:

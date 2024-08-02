@@ -6,7 +6,7 @@ ARG DYNAMIC_CONFIG=true
 WORKDIR /app
 
 RUN apk add --no-cache git
-RUN git clone --branch data_product_workflow https://github.com/colettace/stac-browser.git .
+RUN git clone https://github.com/colettace/stac-browser.git .
 # remove the default config.js
 RUN rm config.js
 RUN npm install
@@ -14,7 +14,8 @@ RUN npm install
 COPY ./browser_config.js ./config.js
 RUN \[ "${DYNAMIC_CONFIG}" == "true" \] && sed -i 's/<!-- <script defer="defer" src=".\/config.js"><\/script> -->/<script defer="defer" src=".\/config.js"><\/script>/g' public/index.html
 
-# Uncomment the next line for development, as well as comment out lines 17-25 and 37
+# Uncomment the next line for running Vue.js dev server
+# as well as comment out lines 17-25 and 37
 #CMD npm start -- --port 8085
 RUN npm run build
 
