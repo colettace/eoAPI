@@ -2,5 +2,5 @@ FROM quay.io/jupyter/datascience-notebook
 WORKDIR /home/jovyan
 RUN rmdir work
 RUN mkdir 3DEP_demo_files
-COPY dockerfiles/notebooks/DB_Hydrate_3DEP_data_ecosystem_POC.ipynb ./3DEP_demo_files/
+COPY dockerfiles/notebooks/*.ipynb ./3DEP_demo_files/
 RUN git clone https://github.com/OpenTopography/OT_3DEP_Workflows.git
