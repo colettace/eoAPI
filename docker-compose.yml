@@ -139,6 +139,16 @@ services:
     volumes:
       - ./dockerfiles/scripts:/tmp/scripts
 
+  start-workflow-api:
+    container_name: start_workflow_api_container
+    build:
+      context: dockerfiles
+      dockerfile: Dockerfile.start_workflow_api
+    ports:
+      - "${MY_DOCKER_IP:-127.0.0.1}:8084:8084"
+    depends_on:
+      - stac-browser
+
   database:
     container_name: pgstac_database_container
     platform: linux/amd64
