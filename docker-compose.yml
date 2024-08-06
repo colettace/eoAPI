@@ -25,7 +25,7 @@ services:
     environment:
       # STAC-FastAPI configuration
       # Defined via pydantic settings, case insensitively
-      # See stac-fastapi/types/stac-fastapi/types/config.py <-- repeated nested dir *not* a typo!
+      # See repo stac-fastapi/stac_fastapi/types/stac_fastapi/types/config.py <-- repeated nested dir *not* a typo!
       - STAC_FASTAPI_TITLE=USGS 3DEP Data Ecosystem
       - STAC_FASTAPI_DESCRIPTION=Proof of concept executed for USGS National Geospatial Program by GSA Centers of Excellence
       - STAC_FASTAPI_VERSION=0.2
@@ -36,6 +36,8 @@ services:
       #- ENABLE_RESPONSE_MODELS=1
       #- OPENAPI_URL=api
       #- DOCS_URL=api.html
+      # See repo stac-fastapi-pgstac/stac_fastapi/pgstac/app.py for up-to-date list of extensions:
+      #- ENABLED_EXTENSIONS=["filter", "query", "sort", "fields", "pagination", "context", "transaction", "bulk_transations"]
       # Postgres connection
       - POSTGRES_USER=username
       - POSTGRES_PASS=password
