@@ -140,7 +140,7 @@ services:
   database:
     container_name: pgstac_database_container
     platform: linux/amd64
-    image: ghcr.io/stac-utils/pgstac:v0.8.5
+    image: ghcr.io/stac-utils/pgstac:latest
     environment:
       - POSTGRES_USER=username
       - POSTGRES_PASSWORD=password
